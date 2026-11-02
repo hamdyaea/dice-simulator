@@ -1,66 +1,73 @@
 #!/usr/bin/env python3
+# Developer: Hamdy Abou El Anein
+# Contact: info@daylightlinux.ch
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""A minimal dice roller with configurable dice and a Tkinter interface."""
+from __future__ import annotations
 
-# developer : Hamdy Abou El Anein
-# hamdy.aea@protonmail.com
-
-from easygui import *
-import random
-import sys
-
-
-dice1 = "./images/dice1.gif"
-dice2 = "./images/dice2.gif"
-dice3 = "./images/dice3.gif"
-dice4 = "./images/dice4.gif"
-dice5 = "./images/dice5.gif"
-dice6 = "./images/dice6.gif"
+import argparse
+import secrets
+import tkinter as tk
 
 
-def dice():
-    inputNum = 6
-    outputNum = list(range(inputNum + 1))
-    outputNum.remove(0)
+def roll(sides: int = 6, count: int = 1) -> tuple[int, ...]:
+    if not 2 <= sides <= 1000:
+        raise ValueError("sides must be between 2 and 1000")
+    if not 1 <= count <= 20:
+        raise ValueError("count must be between 1 and 20")
+    return tuple(secrets.randbelow(sides) + 1 for _ in range(count))
 
-    numbers = random.shuffle(outputNum)
 
-    top6 = outputNum[:1]
+class DiceApp(tk.Tk):
+    def __init__(self) -> None:
+        super().__init__()
+        self.title("Dice Simulator · Hamdy Abou El Anein")
+        self.geometry("480x390")
+        self.minsize(400, 340)
+        self.configure(bg="#101827")
+        self.sides = tk.IntVar(value=6)
+        self.count = tk.IntVar(value=1)
+        self.result = tk.StringVar(value="Ready to roll")
+        self.detail = tk.StringVar(value="Choose your dice and roll.")
+        box = tk.Frame(self, bg="#101827", padx=25, pady=25)
+        box.pack(fill="both", expand=True)
+        tk.Label(box, text="DICE SIMULATOR", font=("DejaVu Sans", 13, "bold"),
+                 bg="#101827", fg="#8bd6c1").pack(pady=(0, 20))
+        controls = tk.Frame(box, bg="#101827")
+        controls.pack()
+        for label, variable, options in (
+            ("Sides", self.sides, (4, 6, 8, 10, 12, 20, 100)),
+            ("Dice", self.count, (1, 2, 3, 4, 5, 6)),
+        ):
+            group = tk.Frame(controls, bg="#101827")
+            group.pack(side="left", padx=14)
+            tk.Label(group, text=label, bg="#101827", fg="#dbe5f0").pack()
+            tk.OptionMenu(group, variable, *options).pack()
+        tk.Label(box, textvariable=self.result, font=("DejaVu Sans", 38, "bold"),
+                 bg="#101827", fg="#f2c879").pack(pady=(30, 8))
+        tk.Label(box, textvariable=self.detail, font=("DejaVu Sans", 10),
+                 bg="#101827", fg="#b8c7d8", wraplength=400).pack()
+        tk.Button(box, text="Roll dice", command=self.throw, font=("DejaVu Sans", 11, "bold"),
+                  bg="#7ddcc0", fg="#10211c", relief="flat", padx=24, pady=10).pack(pady=22)
+        self.bind("<space>", lambda _event: self.throw())
 
-    if top6 == [1]:
-        image = dice1
-    elif top6 == [2]:
-        image = dice2
-    elif top6 == [3]:
-        image = dice3
-    elif top6 == [4]:
-        image = dice4
-    elif top6 == [5]:
-        image = dice5
+    def throw(self) -> None:
+        values = roll(self.sides.get(), self.count.get())
+        self.result.set(str(sum(values)))
+        self.detail.set(" + ".join(map(str, values)) + f"  ·  {len(values)}d{self.sides.get()}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--roll", action="store_true", help="Roll in the terminal")
+    parser.add_argument("--sides", type=int, default=6)
+    parser.add_argument("--count", type=int, default=1)
+    args = parser.parse_args()
+    if args.roll:
+        print(" ".join(map(str, roll(args.sides, args.count))))
     else:
-        image = dice6
-
-    diceChoice = ["Replay", "Quit"]
-    top6 = str(top6)
-    top6 = top6.replace("[", "")
-    top6 = top6.replace("]", "")
-    replay = buttonbox(
-        image=image,
-        choices=diceChoice,
-        title="Dice simulator",
-        msg="Dice simualtor\n\nNumber on the dice : " + str(top6),
-    )
-    if replay == "Replay":
-        dice()
-    else:
-        sys.exit(0)
+        DiceApp().mainloop()
 
 
-logoDice = "./images/dice-full.gif"
-msg = "Do you want to play ?"
-choices = ["Yes", "No"]
-
-begining = buttonbox(msg, image=logoDice, choices=choices)
-
-if begining == "Yes":
-    dice()
-else:
-    sys.exit(0)
+if __name__ == "__main__":
+    main()

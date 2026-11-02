@@ -1,2 +1,5 @@
-.idea/
-venv/
+# Developer: Hamdy Abou El Anein
+# Contact: info@daylightlinux.ch
+__pycache__/
+*.pyc
+.pytest_cache/

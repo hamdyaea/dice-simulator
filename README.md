@@ -1,35 +1,33 @@
 # Dice Simulator
 
-## What's this game ?
+A lightweight, modern Python 3 application for dice rolling.
 
-Dice simulator select randomly the numbers on a 6 faces dice.  
+**Developer:** Hamdy Abou El Anein
+**Contact:** info@daylightlinux.ch
+**License:** GNU GPL v3 (see LICENSE).
 
+## Features
 
-![Screenshot](screenshot.png)
+- Python 3 with clear, testable application logic.
+- No EasyGUI dependency.
+- Tkinter desktop interface using Python standard library.
+- Original version preserved in the old branch:
+  https://github.com/hamdyaea/dice-simulator/tree/old
 
+## Requirements
 
+Python 3.10+ and Tkinter for desktop applications.
 
+## Run
 
-## What you need to make it work :
+    python3 DiceSimulator.py
 
-This game is made for Python 3.  
+Terminal mode:
 
-Install all the packages for : Python 3.  
+    python3 DiceSimulator.py --roll --sides 20 --count 2
 
-easygui at least version 0.98  
+## Test
 
-```sh
-sudo python3 -m pip install --upgrade easygui  
-```  
+    python3 -m unittest discover -s tests -v
 
-## How to launch the game :
-
-```sh
-python3 DiceSimulator.py
-```
-
-
-## Developer - Author
-
-Hamdy Abou El Anein
-
+Runs locally without a cloud service or account.
